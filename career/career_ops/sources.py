@@ -8,6 +8,7 @@ from html.parser import HTMLParser
 import ipaddress
 import json
 from pathlib import Path
+from .config import private_path, private_reference
 import re
 import socket
 from datetime import datetime, timezone
@@ -182,8 +183,8 @@ def _save_response(body: bytes, evidence: dict, evidence_dir) -> dict:
         raw_path = directory / (stem + ".raw")
         meta_path = directory / (stem + ".json")
         raw_path.write_bytes(body)
-        evidence["raw_path"] = str(raw_path.resolve())
-        evidence["metadata_path"] = str(meta_path.resolve())
+        evidence["raw_path"] = private_reference(raw_path)
+        evidence["metadata_path"] = private_reference(meta_path)
         meta_path.write_text(json.dumps(evidence, ensure_ascii=False, indent=2), encoding="utf-8")
     return evidence
 
@@ -546,7 +547,7 @@ def _read_collected_evidence(evidence: dict, expected_url: str | None = None) ->
     if not isinstance(evidence, dict) or not evidence.get("raw_path") or not evidence.get("metadata_path"):
         raise SourceError("collected observation lacks raw response metadata")
     private = PROJECT_PRIVATE.resolve()
-    raw_path, meta_path = Path(evidence["raw_path"]).resolve(), Path(evidence["metadata_path"]).resolve()
+    raw_path, meta_path = private_path(evidence["raw_path"]), private_path(evidence["metadata_path"])
     if not raw_path.is_relative_to(private) or not meta_path.is_relative_to(private):
         raise SourceError("collected evidence path escapes project private boundary")
     try:

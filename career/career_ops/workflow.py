@@ -7,6 +7,7 @@ import uuid
 from pathlib import Path
 
 from .store import PROJECT_ROOT, StateError, Store, canonical_json
+from .config import private_path, private_reference
 
 
 class Workflow:
@@ -66,15 +67,12 @@ class Workflow:
                 value = value.get("path")
             if not value:
                 continue
-            path = Path(value)
-            if not path.is_absolute():
-                path = folder / path
-            path = path.resolve()
+            path = private_path(value)
             if not path.is_relative_to(folder.resolve()):
                 raise StateError(f"材料文件越出当前不可变包目录：{label}")
             if not path.is_file():
                 raise StateError(f"材料文件不存在：{label}")
-            artifacts[label] = {"path": str(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "size": path.stat().st_size}
+            artifacts[label] = {"path": private_reference(path), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "size": path.stat().st_size}
         if not artifacts:
             raise StateError("材料生成器未返回files，不能保存空材料包")
         return artifacts
@@ -82,7 +80,7 @@ class Workflow:
     @staticmethod
     def verify_artifacts(packet: dict) -> None:
         for label, artifact in packet["artifacts"].items():
-            path = Path(artifact["path"])
+            path = private_path(artifact["path"])
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
                 raise StateError(f"已保存材料被更改：{label}；保留原包并明确重新生成新版本")
 

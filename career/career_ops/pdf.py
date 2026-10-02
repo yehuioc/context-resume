@@ -11,13 +11,11 @@ import uuid
 from pathlib import Path
 
 from .candidate import PROJECT_ROOT
+from .config import private_path
 
 
 def _in_private(path: Path) -> Path:
-    path = path.resolve()
-    if not path.is_relative_to(PROJECT_ROOT / "private"):
-        raise ValueError("PDF及预览包含个人信息，必须保留在本项目private目录")
-    return path
+    return private_path(path)
 
 
 def _generate(blocks: list[dict], output: Path) -> dict:

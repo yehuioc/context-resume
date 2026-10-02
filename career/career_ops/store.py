@@ -8,6 +8,7 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
+from .config import private_path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DB = PROJECT_ROOT / "private" / "career-ops.sqlite3"
@@ -337,7 +338,7 @@ class Store:
         if missing or payload.get("status") != "review_ready":
             raise StateError("材料包未完整达到review_ready：" + ",".join(sorted(missing)))
         for label, artifact in artifacts.items():
-            path = Path(artifact["path"])
+            path = private_path(artifact["path"])
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
                 raise StateError(f"材料包保存时文件摘要不一致：{label}")
         packet_digest = digest({"payload": payload, "artifacts": artifacts, "revision_id": opportunity["current_revision_id"], "assessment_id": assessment_id, "candidate_hash": candidate_hash, "jd_hash": opportunity["revision"]["jd_hash"]})
@@ -366,7 +367,7 @@ class Store:
         if not packet["artifacts"]:
             raise StateError("材料包没有可核对的文件")
         for label, artifact in packet["artifacts"].items():
-            path = Path(artifact["path"])
+            path = private_path(artifact["path"])
             if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != artifact["sha256"]:
                 raise StateError(f"材料包文件已修改或丢失：{label}")
         assessment = self.conn.execute("SELECT * FROM assessments WHERE id=?", (packet["assessment_id"],)).fetchone()
@@ -474,13 +475,10 @@ class Store:
 
     def migrate_legacy(self, path: str | Path) -> dict:
         source_path = Path(path).resolve()
-        # A directory migration must not mint a second history identity. Existing
-        # aliases (including Windows junctions) still resolve to this same source.
-        identities = [Path(r[0]) for r in self.conn.execute("SELECT DISTINCT source_path FROM legacy_records")
-                      if Path(r[0]).resolve() == source_path]
-        if len(identities) > 1:
-            raise StateError("旧记录存在多个来源身份，需要先核对，不能自动重复导入")
-        identity_path = identities[0] if identities else source_path
+        # Original rows remain verbatim; the source identity belongs to this
+        # project and does not depend on a machine path or compatibility alias.
+        identity_path = (source_path.relative_to(PROJECT_ROOT.parent).as_posix()
+                         if source_path.is_relative_to(PROJECT_ROOT.parent) else source_path)
         source = sqlite3.connect(source_path.as_uri() + "?mode=ro", uri=True)
         source.row_factory = sqlite3.Row
         before = self.conn.execute("SELECT COUNT(*) FROM legacy_records").fetchone()[0]

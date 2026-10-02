@@ -3,10 +3,12 @@ from __future__ import annotations
 
 import html
 import json
+import os
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import quote, urlsplit
 
 from .store import Store
+from .config import private_path
 
 
 STYLE = """body{font-family:system-ui,'Microsoft YaHei',sans-serif;margin:auto;max-width:1180px;padding:32px;color:#18232f;background:#f4f6f8}h1{font-size:28px}h2{font-size:21px;border-bottom:1px solid #cdd7df;padding-bottom:8px}section{background:white;padding:24px;margin:18px 0;border-radius:10px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-family:inherit;line-height:1.7}table{width:100%;border-collapse:collapse}td,th{padding:10px;text-align:left;border-bottom:1px solid #ddd}a{color:#075cac}code{overflow-wrap:anywhere}.warning{border-left:5px solid #d9a000;padding:16px;background:#fff3cb}.meta{color:#546574}.tag{display:inline-block;padding:4px 8px;background:#e5eef6;border-radius:4px}summary{cursor:pointer;font-weight:600}details{margin-top:10px}nav a{margin-right:20px}"""
@@ -26,9 +28,10 @@ def safe_link(url: str, label: str) -> str:
     return f'<a href="{esc(url)}" target="_blank" rel="noopener noreferrer">{esc(label)}</a>'
 
 
-def file_preview(artifact: dict, label: str) -> str:
-    path = Path(artifact["path"])
-    link = f'<a href="{esc(path.as_uri())}">{esc(label)}：{esc(path.name)}</a>'
+def file_preview(artifact: dict, label: str, view_directory: Path) -> str:
+    path = private_path(artifact["path"])
+    href = quote(Path(os.path.relpath(path, view_directory)).as_posix(), safe="/")
+    link = f'<a href="{esc(href)}">{esc(label)}：{esc(path.name)}</a>'
     if path.suffix.lower() in {".md", ".txt", ".json", ".html"} and path.is_file():
         # HTML is shown as escaped source; external JD or draft content cannot execute.
         content = path.read_text(encoding="utf-8-sig", errors="replace")
@@ -65,7 +68,7 @@ def render_review(opportunity: dict, packet: dict | None, output_path: str | Pat
     if packet:
         parts.append('<section><h2>本次材料版本</h2>' + json_block({key: packet[key] for key in ("id", "packet_digest", "candidate_hash", "jd_hash", "revision_id", "assessment_id")}) + "</section>")
         for label, artifact in packet["artifacts"].items():
-            parts.append(f'<section><h2>{esc(label)}</h2>{file_preview(artifact, label)}</section>')
+            parts.append(f'<section><h2>{esc(label)}</h2>{file_preview(artifact, label, Path(output_path).resolve().parent)}</section>')
     parts.append('<section><h2>人工决定、真实投递与回复</h2>' + json_block({key: opportunity[key] for key in ("human_decisions", "approvals", "application", "interactions", "contacts", "next_actions")}) + "</section>")
     path = Path(output_path).resolve()
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -20,7 +20,7 @@ python -m career_ops --help
 python -m career_ops status
 ```
 
-Windows 也可以使用 `scripts/career-ops.cmd`；它调用当前环境的 `python`。测试环境使用 `python -m pip install -r requirements-dev.txt`，再运行 `python -m pytest -q`。测试临时目录和缓存都在本项目的 `private/test-tmp/`。
+Windows 也可以使用项目根的 `scripts/career-ops.cmd`；它调用当前环境的 `python`。测试环境使用 `python -m pip install -r requirements-dev.txt`，再从项目根运行 `python -m pytest -q`。测试临时目录和缓存都在项目内部。
 
 ## 候选人事实与个人资料
 
@@ -43,7 +43,9 @@ python -m career_ops --candidate examples/career-profile.json --db private/demo.
 
 `CAREER_WORKSPACE_ROOT` 和 `CAREER_OPS_CANDIDATE` 可分别覆盖这两个配置。命令的 `--candidate` 可选择具体事实文件，`status` 会显示实际采用的事实入口。事实源由本人维护，本项目只读，不按 JD 新增经历或升级熟练度。
 
-真实 JD、原响应、SQLite、投递包、简历预览、联系人、回复与验收材料全部保存在忽略的 `private/`。这些资料需要单独备份，GitHub 源码不能恢复个人台账。网页 Project Brain MCP 可分别通过源码来源和已授权的 `private/` 目录来源读取；源码公开不改变私人资料的读取授权。
+真实 JD、原响应、SQLite、投递包、简历预览、联系人和回复全部保存在本模块忽略的 `private/`。这些资料需要单独备份，GitHub 源码不能恢复个人台账。网页 Project Brain MCP 通过唯一来源 `context-resume` 读取授权范围，具体排除项见项目根说明。
+
+投递包与采集回执的文件字段保存为 `private/...`，以本模块目录为基准；通过 `career_ops.config.private_path` 解析，拒绝越界。审阅页链接相对于页面位置。事实主张审计的 `identity_source.path` 以项目根为基准；事实证据使用账本声明的来源路径和哈希。
 
 ## 从岗位到审阅材料
 
@@ -87,6 +89,6 @@ python -m career_ops export
 
 开源取舍与固定提交依据见 [开源研究](docs/oss-research.md)。`scripts/research_oss.py` 只读取上游说明与许可证，不执行上游代码。默认登记使用 `examples/oss-registry.json`，下载快照保存在 `private/oss-reference/`；本机可以通过 `private/local-config.json` 的 `oss_registry`、`oss_reference` 或脚本的明确参数接续既有资料。
 
-原系统完成过本地岗位、材料和状态链路验收；个人验收原件保留在 `private/acceptance/`。合成测试不证明真实投递或 HR 回复，也不证明公开接口永久可用。本项目没有 BOSS 在线简历自动更新或浏览器自动投递适配器。
+历史验收原件保留在项目根 `private/archives/`，只说明当时运行范围；当前使用以本 README 和实际代码为准。合成测试不证明真实投递或 HR 回复，也不证明公开接口永久可用。本项目没有 BOSS 在线简历自动更新或浏览器自动投递适配器。
 
 当前仅公开源码，尚未新增开源许可证；第三方依赖遵守各自许可。

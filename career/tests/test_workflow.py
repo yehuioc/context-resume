@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from career_ops.config import private_path
 from unittest.mock import patch
 
 from career_ops.cli import main, validate_collection_evidence
@@ -39,7 +40,7 @@ class WorkflowTests(unittest.TestCase):
             second = self.workflow.prepare(self.opportunity_id, output_root=self.root / "packets")
             self.assertEqual(first["id"], second["id"])
             self.assertEqual(builder.call_count, 1)
-            Path(first["artifacts"]["resume_md"]["path"]).write_text("edited", encoding="utf-8")
+            private_path(first["artifacts"]["resume_md"]["path"]).write_text("edited", encoding="utf-8")
             with self.assertRaises(StateError): self.workflow.prepare(self.opportunity_id, output_root=self.root / "packets")
 
     def test_review_escapes_external_markup_and_has_platform_label(self):

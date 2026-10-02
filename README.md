@@ -18,7 +18,7 @@ GitHub：[yehuioc/context-resume](https://github.com/yehuioc/context-resume)。
 | `engine/` | 来源清单独立校验的脱敏项目证据包生成；输出 Markdown/HTML，详见 [引擎说明](engine/README.md) |
 | `core/` | 共享结构、表达方法、排版资产和来源研究；关键词覆盖只作辅助，不能代替事实或岗位判断，详见 [共享资产说明](core/README.md) |
 | `knowledge/` | 简历资料知识库的研究与边界；目前没有完成的编译器或检索引擎，详见 [当前状态](knowledge/README.md) |
-| `legacy/` | 旧求职数据库的保全及只读兼容入口；不再维护第二份状态或执行旧写入代码，详见 [兼容说明](legacy/README.md) |
+| `legacy/` | 旧求职数据库的只读来源档案；没有运行入口，详见 [档案说明](legacy/README.md) |
 
 本人事实账本 `career-profile-v1` 与通用脱敏证据包 `evidence-pack` 是不同实体，不强行合并字段。`career` 只从已经审核且哈希一致的事实中选择表达，生成的匹配和材料不会自动升级为新事实；反馈进入同一岗位库，事实变更需复核。
 
@@ -50,6 +50,8 @@ pwsh -NoProfile -File engine/tests/test-build-customer-pack.ps1
 
 本机外部证据根和资料位置可在 `career/private/local-config.json` 配置；环境变量 `CAREER_WORKSPACE_ROOT`、`CAREER_OPS_CANDIDATE`、`CAREER_OPS_DB` 可覆盖相应默认值。来源样例与基线的字节哈希由 `.gitattributes` 保持一致。
 
+投递包、文件摘要和采集回执中的文件引用以 `career/` 为基准，保存为 `private/...` 相对路径；读取时由同一模块解析，不依赖命令启动目录。审阅页使用相对链接。候选人证据按事实账本所声明的证据根解析，外部证据根仍需本机配置。
+
 ## 网页读取与公开边界
 
 网页 Project Brain MCP 使用唯一来源名 `context-resume`，directory 模式读取本项目的源码，以及已经授权的 `self/`、岗位库和投递包；简历 PDF/DOCX 可通过二进制读取取得。先列目录，再按任务读取，完整快照需要分页。工具只读，网页不会执行投递或修改事实。
@@ -58,6 +60,6 @@ GitHub 不上传 `self/`、`requirements/` 中的私人对话、任何 `private/
 
 闲鱼的定价、订单、上架、客服、营销和商业验收不属于本项目的运行模块。历史资料保存在本地 `private/archives/pre-integration/`，没有删除个人简历或原始证据。`xianyu-ops` 与注意力恢复项目 `focus-resume-console` 继续独立运行。
 
-本项目只有根目录一份活动 Git。旧 `career-ops` 与 `internship-job-agent` 路径是 Windows junction，分别指向这里的 `career/` 与 `legacy/`，用于保留历史材料的路径和旧命令入口；它们没有独立副本或 Git。各原仓库的历史和标签在本地归档 Git bundle 中，可按需恢复。
+本项目只有根目录一份活动 Git，MCP 也只登记这一真实目录。日常任务从本 README 进入 `self/` 的事实和 `career/` 的流程；其他模块按上表读取。历史源码、原始记录与 Git bundle 位于本地 `private/archives/`，仅用于追溯，不是运行入口。
 
 第三方方法与资产保留各自来源、提交和许可标注。当前仅公开源码，未另行声明整仓开源许可。

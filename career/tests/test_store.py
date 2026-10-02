@@ -4,6 +4,7 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
+from career_ops.config import private_path
 
 from career_ops.store import PROJECT_ROOT, REQUIRED_ARTIFACTS, StateError, Store, text_hash
 
@@ -127,7 +128,7 @@ class StoreTests(unittest.TestCase):
         self.authorize(opportunity_id, packet_id)
         with self.assertRaises(StateError):
             self.store.mark_applied(packet_id, "candidate-v2", confirmation_type="user_confirmation", evidence="test")
-        path = Path(self.store.get_packet(packet_id)["artifacts"]["resume_md"]["path"])
+        path = private_path(self.store.get_packet(packet_id)["artifacts"]["resume_md"]["path"])
         path.write_text("tampered", encoding="utf-8")
         with self.assertRaises(StateError): self.send_fixture(packet_id)
         self.assertEqual(self.store.funnel()["stages"]["applied"], 0)

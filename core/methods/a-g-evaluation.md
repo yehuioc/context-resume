@@ -16,7 +16,7 @@ method: a-g-evaluation
 
 # A-G 岗位评估(吸收 career-ops)
 
-来源:career-ops `modes/oferta.md`(commit `93b1cbb`,MIT)提炼。完整原文见 `../upstream/career-ops/modes/oferta.md`,本文档是吸收后的可执行方法。
+来源:career-ops `modes/oferta.md`(commit `93b1cbb`,MIT)提炼。完整原文见 上游仓库 `https://github.com/santifer/career-ops/blob/93b1cbb/modes/oferta.md`；本机快照在项目根 `private/archives/pre-integration/upstream/`,本文档是吸收后的可执行方法。
 
 ## 前置门(评估前必须通过)
 

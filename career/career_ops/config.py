@@ -9,6 +9,20 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 LOCAL_CONFIG = PROJECT_ROOT / "private" / "local-config.json"
 
 
+def private_path(value: str | Path) -> Path:
+    """Resolve current private references against the module, never caller cwd."""
+    path = Path(value)
+    path = (path if path.is_absolute() else PROJECT_ROOT / path).resolve()
+    if not path.is_relative_to((PROJECT_ROOT / "private").resolve()):
+        raise ValueError("文件路径超出本模块 private 目录")
+    return path
+
+
+def private_reference(value: str | Path) -> str:
+    """Persist a portable reference, resolving its physical location only on use."""
+    return private_path(value).relative_to(PROJECT_ROOT).as_posix()
+
+
 def configured_path(key: str, default: str | Path, environment: str | None = None) -> Path:
     settings = {}
     if LOCAL_CONFIG.is_file():

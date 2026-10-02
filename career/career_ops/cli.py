@@ -11,6 +11,7 @@ from pathlib import Path
 from .store import DEFAULT_DB, PROJECT_ROOT, StateError, Store
 from .workflow import Workflow
 from .candidate import DEFAULT_PROFILE
+from .config import private_path
 
 
 def write_json(value: object, output: str | Path | None = None) -> None:
@@ -24,7 +25,7 @@ def write_json(value: object, output: str | Path | None = None) -> None:
 
 
 def validate_collection_evidence(observations: list[dict], evidence_dir: str | Path) -> None:
-    directory = Path(evidence_dir).resolve()
+    directory = private_path(evidence_dir)
     if not directory.is_relative_to((PROJECT_ROOT / "private").resolve()):
         raise StateError("采集证据必须位于本项目private目录")
     checked: set[tuple[str, str]] = set()
@@ -32,7 +33,7 @@ def validate_collection_evidence(observations: list[dict], evidence_dir: str | P
         count = 0
         if isinstance(value, dict):
             if "raw_path" in value:
-                raw_path = Path(value["raw_path"]).resolve()
+                raw_path = private_path(value["raw_path"])
                 expected = str(value.get("sha256", ""))
                 if not raw_path.is_relative_to(directory) or not raw_path.is_file() or not expected:
                     raise StateError("采集原始响应文件缺失或越界")
@@ -40,7 +41,7 @@ def validate_collection_evidence(observations: list[dict], evidence_dir: str | P
                 if key not in checked:
                     if hashlib.sha256(raw_path.read_bytes()).hexdigest() != expected:
                         raise StateError("采集原始响应摘要不一致")
-                    metadata_path = Path(value.get("metadata_path", "")).resolve()
+                    metadata_path = private_path(value.get("metadata_path", ""))
                     if not metadata_path.is_relative_to(directory) or not metadata_path.is_file():
                         raise StateError("采集响应元数据缺失或越界")
                     metadata = json.loads(metadata_path.read_text(encoding="utf-8-sig"))
@@ -109,7 +110,7 @@ def run(args: argparse.Namespace) -> object:
                 raise StateError("导入文件必须是Observation列表或observations/samples对象")
             if args.receipt:
                 receipt = json.loads(Path(args.receipt).read_text(encoding="utf-8-sig"))
-                if Path(receipt.get("selected_file", "")).resolve() != import_path or receipt.get("selected_sha256") != hashlib.sha256(import_path.read_bytes()).hexdigest():
+                if private_path(receipt.get("selected_file", "")) != import_path or receipt.get("selected_sha256") != hashlib.sha256(import_path.read_bytes()).hexdigest():
                     raise StateError("采集文件与回执不一致；不能继承核验状态")
                 if "scripts/collect_samples.py" not in receipt.get("commands", "") or not receipt.get("evidence_dir"):
                     raise StateError("不是本项目可追溯的采集回执")

@@ -4,6 +4,7 @@ from __future__ import annotations
 import difflib
 import html
 import json
+import os
 import re
 from collections import OrderedDict
 from datetime import datetime, timezone
@@ -13,8 +14,9 @@ from urllib.parse import urlparse
 from .candidate import (PROJECT_ROOT, WORKSPACE_ROOT, CandidateError, approved_text,
                         canonical_hash, sha256_bytes, verify_candidate_current)
 from .matching import assess, jd_text, job_id, job_title, verify_requirement_offsets
+from .config import private_path, private_reference
 
-MATERIAL_VERSION = "career-materials-v1"
+MATERIAL_VERSION = "career-materials-v2"
 
 
 class MaterialError(ValueError):
@@ -296,7 +298,7 @@ def build_packet(observation: dict, candidate: dict, assessment: dict,
     audit = {"schema_version": "career-claim-audit-v1", "material_version": MATERIAL_VERSION,
              "candidate_hash": candidate["candidate_hash"], "baseline_hash": candidate["baseline_hash"],
              "jd_hash": assessment["jd_hash"], "claims": claims,
-             "identity_source": {"path": candidate["_profile_path"], "sha256": candidate["candidate_hash"],
+             "identity_source": {"path": os.path.relpath(candidate["_profile_path"], PROJECT_ROOT.parent).replace("\\", "/"), "path_base": "project-root", "sha256": candidate["candidate_hash"],
                                  "fields": ["identity.name", "identity.contact"]},
              "target_label_source": {"field": "JD role_title/title", "jd_hash": assessment["jd_hash"],
                                      "boundary": "应聘岗位标签，不是候选人能力主张"},
@@ -338,26 +340,27 @@ def build_packet(observation: dict, candidate: dict, assessment: dict,
     except Exception as error:
         raise MaterialError(f"PDF生成失败，包未达到review_ready：{error}") from error
     file_hashes = {kind: sha256_bytes(path.read_bytes()) for kind, path in files.items()}
-    manifest = {"schema_version": "career-packet-v1", "material_version": MATERIAL_VERSION,
+    manifest = {"schema_version": "career-packet-v2", "material_version": MATERIAL_VERSION,
+                "path_base": "career-module",
                 "packet_key": key, "job_id": job_id(observation), "status": "review_ready",
                 "candidate_hash": candidate["candidate_hash"], "baseline_hash": candidate["baseline_hash"],
                 "jd_hash": assessment["jd_hash"], "assessment_hash": canonical_hash(assessment),
                 "official_apply_url": official, "source_url": source_url,
-                "files": {kind: str(path) for kind, path in files.items()}, "file_hashes": file_hashes,
+                "files": {kind: private_reference(path) for kind, path in files.items()}, "file_hashes": file_hashes,
                 "pdf": pdf_metadata, "created_at": datetime.now(timezone.utc).isoformat(),
                 "producer": "codex", "producer_role": "foreground-worker", "review_owner": "codex-controller",
                 "review_state": "needs_review", "canonical_status": "candidate",
                 "approval_boundary": "人工批准必须绑定本manifest和文件哈希；review_ready不是applied"}
     manifest["manifest_hash"] = canonical_hash(manifest)
     _write(output / "manifest.json", _json(manifest))
-    packet = {**manifest, "manifest": manifest, "manifest_path": str(output / "manifest.json"), "output_dir": str(output)}
+    packet = {**manifest, "manifest": manifest, "manifest_path": private_reference(output / "manifest.json"), "output_dir": private_reference(output)}
     verify_packet(packet, candidate)
     return packet
 
 
 def verify_packet(packet: dict | str | Path, candidate: dict | None = None) -> dict:
     if isinstance(packet, (str, Path)):
-        path = Path(packet)
+        path = private_path(packet)
         if path.is_dir():
             path = path / "manifest.json"
         manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -368,12 +371,13 @@ def verify_packet(packet: dict | str | Path, candidate: dict | None = None) -> d
     if recorded != canonical_hash(clean):
         raise MaterialError("manifest被修改")
     for kind, raw_path in manifest["files"].items():
-        path = Path(raw_path).resolve()
-        if not path.is_relative_to(PROJECT_ROOT / "private"):
-            raise MaterialError("manifest文件路径超出private目录")
+        try:
+            path = private_path(raw_path)
+        except ValueError as error:
+            raise MaterialError("manifest文件路径超出private目录") from error
         if not path.is_file() or sha256_bytes(path.read_bytes()) != manifest["file_hashes"].get(kind):
             raise MaterialError(f"投递材料已被修改或丢失：{kind}")
-    files = manifest["files"]
+    files = {key: private_path(value) for key, value in manifest["files"].items()}
     jd = Path(files["jd"]).read_bytes().decode("utf-8")
     if sha256_bytes(jd.encode("utf-8")) != manifest["jd_hash"]:
         raise MaterialError("JD原文哈希不符")

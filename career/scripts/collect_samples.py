@@ -12,6 +12,7 @@ import sys
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT))
 from career_ops.sources import SourceError, collect_greenhouse, collect_ncss, utc_now, verify_observation
+from career_ops.config import private_reference
 
 
 def main():
@@ -87,7 +88,7 @@ def main():
     receipt = {"producer": "codex", "producer_role": "foreground-worker", "producer_evidence": "native career_sources subagent; scripts/collect_samples.py live public GET collection",
                "review_owner": "codex-controller", "review_state": "needs_review", "canonical_status": "candidate",
                "started_at": started, "finished_at": utc_now(), "commands": "python scripts/collect_samples.py", "source_queries": queries,
-               "selected_file": str(output), "selected_sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "pool_file": str(pool_path), "evidence_dir": str(evidence_dir),
+               "selected_file": private_reference(output), "selected_sha256": hashlib.sha256(output.read_bytes()).hexdigest(), "pool_file": private_reference(pool_path), "evidence_dir": private_reference(evidence_dir),
                "full_jd_selected": sum(len(j["jd_raw"]) >= 80 for j in selected), "source_counts": dict(Counter(j["source_channel"] for j in selected)),
                "verification_counts": dict(Counter(j["verification_status"] for j in selected)), "employment_counts": dict(Counter(j["employment_type"] for j in selected)),
                "failures": errors, "boundary": "NCSS is platform publication, not independent employer identity. Anthropic roles are overseas source/identity constraint negatives; official FAQ currently says no internships. No resume sent, login or installation performed."}
