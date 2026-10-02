@@ -1,0 +1,18 @@
+{
+  "customer_id": "public-sample-001",
+  "human_reviewed_at": "2026-07-29",
+  "sources": [
+    {
+      "id": "S1",
+      "label": "脱敏项目 README 与运行记录",
+      "type": "document",
+      "locator": "公开样例材料 1"
+    },
+    {
+      "id": "S2",
+      "label": "脱敏测试报告",
+      "type": "test-report",
+      "locator": "公开样例材料 2"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+private/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db

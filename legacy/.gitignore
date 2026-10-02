@@ -1,0 +1,14 @@
+.venv/
+runtime/
+external/
+var/
+private/
+*.sqlite3
+*.db
+.env
+.env.*
+*.cookie*
+*credential*
+*session*
+__pycache__/
+*.pyc

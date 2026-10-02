@@ -1,0 +1,104 @@
+{
+  "customer_id": "public-sample-001",
+  "generated_at": "2026-07-28",
+  "target_role": "AI 自动化实习生",
+  "summary": "该项目最强的信号不是“接入了大模型”，而是真实使用中发现故障、重新定义规则并以自动化测试验证修复。",
+  "input_assessment": {
+    "pii_review": "passed",
+    "evidence_sufficiency": "sufficient",
+    "conflict_status": "none",
+    "target_jd_status": "provided",
+    "request_scope": "standard",
+    "blocking_reasons": []
+  },
+  "evidence": [
+    {
+      "id": "E1",
+      "claim": "建立 Telegram 消息接收、结构化分析和次日行动同步链路",
+      "source_refs": ["S1", "S2"],
+      "status": "confirmed",
+      "boundary": "可以写建立和验收链路；不能暗示全部代码均由本人独立手写"
+    },
+    {
+      "id": "E2",
+      "claim": "建立并通过 29 项自动化测试",
+      "source_refs": ["S2"],
+      "status": "confirmed",
+      "boundary": "可以使用准确数字；不得扩大为生产 SLA"
+    }
+  ],
+  "contribution_breakdown": [
+    {
+      "actor": "本人",
+      "contribution": "提出真实需求、复现故障、定义规则和验收修复结果",
+      "boundary": "可写需求拆解、规则设计和验收；不能扩大为全部代码独立手写",
+      "evidence_refs": ["E1", "E2"]
+    },
+    {
+      "actor": "AI",
+      "contribution": "协助生成和修改代码与文档",
+      "boundary": "必须保留 AI 协作事实，不把生成内容自动视为本人独立能力",
+      "evidence_refs": ["E1"]
+    },
+    {
+      "actor": "外部工具与开源组件",
+      "contribution": "提供 Telegram 接口及项目依赖的基础能力",
+      "boundary": "不得把第三方平台或开源组件能力表述为本人原创",
+      "evidence_refs": ["E1"]
+    }
+  ],
+  "resume_bullets": [
+    {
+      "label": "事实保守版",
+      "text": "建立 Telegram 每日回顾到结构化分析与次日行动同步的自动链路，并在真实使用中复现跨日归档、行动丢失和模型误判问题。",
+      "evidence_refs": ["E1"]
+    },
+    {
+      "label": "结果优先版",
+      "text": "重新定义按被复盘日期归档与逐条原文证据校验规则，补充消息去重、失败重试和中断恢复，并以 29 项自动化测试验证关键边界。",
+      "evidence_refs": ["E1", "E2"]
+    },
+    {
+      "label": "岗位匹配版",
+      "text": "负责 AI 自动化流程的需求拆解、故障复现、规则设计和验收；代码与文档主要借助 AI 协作实现，最终通过日志、测试和真实消息回放确认结果。",
+      "evidence_refs": ["E1", "E2"]
+    }
+  ],
+  "jd_matches": [
+    {
+      "requirement": "能设计和验收 AI Agent 工作流",
+      "evidence": "真实需求、规则重定义、失败恢复和测试验收",
+      "status": "matched",
+      "action": "面试中准备解释一次被否决的 AI 方案"
+    },
+    {
+      "requirement": "独立编写复杂 Python 系统",
+      "evidence": "当前证据主要是 AI 协作下的阅读、修改和验收",
+      "status": "gap",
+      "action": "不得写成熟练独立开发；补一个可独立解释的代码样例"
+    }
+  ],
+  "interview_questions": [
+    "为什么按被复盘日期而不是消息发送日期归档？",
+    "消息重复处理如何识别，幂等键为什么这样选择？",
+    "哪部分由 AI 生成，你本人否决或修改了什么？"
+  ],
+  "portfolio_outline": [
+    {
+      "section": "真实问题",
+      "content": "跨日归档、行动丢失和模型误判使每日复盘结果不可信。"
+    },
+    {
+      "section": "本人贡献",
+      "content": "复现问题、定义规则、提出验收条件并核对真实修复结果。"
+    },
+    {
+      "section": "验证证据",
+      "content": "日志、消息身份、修复报告与 29 项自动化测试。"
+    }
+  ],
+  "warnings": [
+    "不得把 AI 协作实现表述为全部代码独立手写。",
+    "不得用测试数量替代真实业务效果。"
+  ]
+}

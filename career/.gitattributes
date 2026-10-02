@@ -1,0 +1,2 @@
+# Evidence hashes must survive Windows/Linux checkouts unchanged.
+examples/*.md text eol=lf

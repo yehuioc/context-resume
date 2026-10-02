@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "context-resume:evidence-pack:v1",
+  "title": "项目经历证据包(事实层)",
+  "description": "证据包输出 schema,由 service/product/sample-output.json 规范生成(service 生成器 build-customer-pack.ps1 校验同构)。12 个顶层字段,证据全链追溯 S→E→表达。",
+  "upstream_source": {
+    "project": "context-resume service v0.2.0-rc.2 自有产物(镜像 sample-output.json)",
+    "commit": "e9d74f5",
+    "license": "internal"
+  },
+  "type": "object",
+  "required": [
+    "customer_id", "generated_at", "target_role", "summary", "input_assessment",
+    "evidence", "contribution_breakdown", "resume_bullets", "jd_matches",
+    "interview_questions", "portfolio_outline", "warnings"
+  ],
+  "properties": {
+    "customer_id": { "type": "string", "pattern": "^[A-Za-z0-9-]+$", "description": "非匿名 ID 拒绝" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "target_role": { "type": "string" },
+    "summary": { "type": "string" },
+    "input_assessment": {
+      "type": "object",
+      "description": "输入评估门禁;任一不满足即生成 blocked",
+      "required": ["pii_review", "evidence_sufficiency", "conflict_status", "target_jd_status", "request_scope"],
+      "properties": {
+        "pii_review": { "type": "string", "enum": ["passed", "failed"] },
+        "evidence_sufficiency": { "type": "string", "enum": ["sufficient", "insufficient"] },
+        "conflict_status": { "type": "string", "enum": ["none", "conflict"] },
+        "target_jd_status": { "type": "string", "enum": ["provided", "not_provided"] },
+        "request_scope": { "type": "string", "enum": ["standard", "blocked"] },
+        "blocking_reasons": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "description": "事实证据台账;E1/E2… 唯一 ID,source_refs 必须指向来源清单 S1/S2…",
+      "items": {
+        "type": "object",
+        "required": ["id", "claim", "source_refs", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^E[0-9]+$" },
+          "claim": { "type": "string" },
+          "source_refs": { "type": "array", "items": { "type": "string", "pattern": "^S[0-9]+$" } },
+          "status": { "type": "string", "enum": ["confirmed", "needs_confirmation"] },
+          "boundary": { "type": "string" }
+        }
+      }
+    },
+    "contribution_breakdown": {
+      "type": "array",
+      "description": "本人/AI/队友/外部工具贡献边界,evidence_refs 必须指向已确认证据",
+      "items": {
+        "type": "object",
+        "required": ["actor", "contribution", "boundary", "evidence_refs"],
+        "properties": {
+          "actor": { "type": "string" },
+          "contribution": { "type": "string" },
+          "boundary": { "type": "string" },
+          "evidence_refs": { "type": "array", "items": { "type": "string", "pattern": "^E[0-9]+$" } }
+        }
+      }
+    },
+    "resume_bullets": {
+      "type": "array",
+      "description": "简历表达 2-3 组:事实保守版/结果优先版/岗位匹配版;evidence_refs 必须已确认",
+      "items": {
+        "type": "object",
+        "required": ["label", "text", "evidence_refs"],
+        "properties": {
+          "label": { "type": "string" },
+          "text": { "type": "string" },
+          "evidence_refs": { "type": "array", "items": { "type": "string", "pattern": "^E[0-9]+$" } }
+        }
+      }
+    },
+    "jd_matches": {
+      "type": "array",
+      "description": "JD 匹配与缺口(LLM 标签层;结构化打分引擎见 methods/jd-tailoring.md)",
+      "items": {
+        "type": "object",
+        "required": ["requirement", "evidence", "status", "action"],
+        "properties": {
+          "requirement": { "type": "string" },
+          "evidence": { "type": "string" },
+          "status": { "type": "string", "enum": ["matched", "partial", "gap"] },
+          "action": { "type": "string" }
+        }
+      }
+    },
+    "interview_questions": { "type": "array", "items": { "type": "string" } },
+    "portfolio_outline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["section", "content"],
+        "properties": {
+          "section": { "type": "string" },
+          "content": { "type": "string" }
+        }
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  }
+}

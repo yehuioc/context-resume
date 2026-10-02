@@ -1,0 +1,65 @@
+{
+  "description": "2026-09-30 已核查公开上游的固定提交登记；不含个人材料，不执行上游代码。",
+  "repositories": [
+    {
+      "url": "https://github.com/strelov1/freehire",
+      "repository": "strelov1/freehire",
+      "commit": "900408d7e3172193966064f096b4dbf4e5d78b2a",
+      "license": "MIT"
+    },
+    {
+      "url": "https://github.com/speedyapply/JobSpy",
+      "repository": "speedyapply/JobSpy",
+      "commit": "655af2bcb383506506ecbfc0be95a4887245b25e",
+      "license": "MIT"
+    },
+    {
+      "url": "https://github.com/Bynlk/JobHunter",
+      "repository": "Bynlk/JobHunter",
+      "commit": "4b5a69010a98b3d80b408fd983c1c2dfa60788e4",
+      "license": "MIT"
+    },
+    {
+      "url": "https://github.com/huluobo2237-pixel/JobCopilot",
+      "repository": "huluobo2237-pixel/JobCopilot",
+      "commit": "ca3e729fa12a9ee142a298a01c9cce03244d12f0",
+      "license": "MIT"
+    },
+    {
+      "url": "https://github.com/czc6666/czc-good-job",
+      "repository": "czc6666/czc-good-job",
+      "commit": "e07bf4cb663d9531864ca22eb6195b77e064c3b5",
+      "license": "MIT"
+    },
+    {
+      "url": "https://github.com/Aanlik/boss-auto-apply",
+      "repository": "Aanlik/boss-auto-apply",
+      "commit": "7fc55669a14378c941563a883ab06fae9fe8cd01",
+      "license": "unknown"
+    },
+    {
+      "url": "https://github.com/Malik1942/job-agent",
+      "repository": "Malik1942/job-agent",
+      "commit": "b859ab6aadb7ecbc61d79bbd54dc1c33f060e25f",
+      "license": "unknown"
+    },
+    {
+      "url": "https://github.com/jainary4/JobScanner",
+      "repository": "jainary4/JobScanner",
+      "commit": "315bf3becae155970a2e2f89a11171ce044a80de",
+      "license": "unknown"
+    },
+    {
+      "url": "https://github.com/srbhr/Resume-Matcher",
+      "repository": "srbhr/Resume-Matcher",
+      "commit": "9c05e423dfde44a5b4bb398d2dc7507194252ded",
+      "license": "Apache-2.0"
+    },
+    {
+      "url": "https://github.com/feder-cr/Jobs_Applier_AI_Agent_AIHawk",
+      "repository": "feder-cr/Jobs_Applier_AI_Agent_AIHawk",
+      "commit": "94c9736610b6ca54ed115e6241d8637f4d25a4c3",
+      "license": "MIT"
+    }
+  ]
+}

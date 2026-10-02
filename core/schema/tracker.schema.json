@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "context-resume:tracker:v1",
+  "title": "投递追踪(事实层)",
+  "description": "投递漏斗追踪 schema。吸收 ai-job-search /outcome 的 tracker CSV 字段与状态枚举(commit 1cdaf94, MIT)与对话漏斗字段(送达/已读/回复/要简历/面试/拒绝原因)。",
+  "upstream_source": {
+    "project": "MadsLorentzen/ai-job-search",
+    "commit": "1cdaf94",
+    "license": "MIT",
+    "note": "tracker 头字段与状态枚举来自 /outcome 命令;归档结构 documents/applications/<company>_<role>/"
+  },
+  "type": "object",
+  "required": ["version", "applications"],
+  "properties": {
+    "version": { "type": "string" },
+    "applications": {
+      "type": "array",
+      "description": "投递记录;每 30-50 投复盘一次漏斗",
+      "items": {
+        "type": "object",
+        "required": ["id", "company", "role", "date_applied", "channel", "status"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^APP[0-9]+$" },
+          "date_applied": { "type": "string", "format": "date" },
+          "company": { "type": "string" },
+          "sector": { "type": "string" },
+          "role": { "type": "string" },
+          "role_type": { "type": "string" },
+          "channel": { "type": "string", "description": "如 BOSS直聘/官网/内推/邮箱" },
+          "posting_url": { "type": "string" },
+          "jd_text_path": { "type": "string", "description": "JD 原文保存路径(评估须基于当前岗位正文,历史分数不能替代)" },
+          "fit_rating": { "type": "number", "minimum": 0, "maximum": 100 },
+          "contact_person": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": [
+              "sent", "read", "replied", "cv_requested", "interview", "offer",
+              "hired", "offer_declined", "rejected", "no_response", "interview_only", "withdrawn"
+            ],
+            "description": "漏斗状态:送达/已读/回复/要简历/面试/offer/终态;终态含 hired/offer_declined/rejected/no_response/interview_only/withdrawn"
+          },
+          "funnel_stage": {
+            "type": "string",
+            "enum": ["delivered", "read", "reply", "cv_sent", "interview", "offer", "closed"],
+            "description": "对话漏斗层(与 status 冗余,用于漏斗统计)"
+          },
+          "rejection_reason": { "type": "string", "description": "拒绝原因(如有)" },
+          "feedback": { "type": "string", "description": "反馈原文(喂给 fit framework 校准与 STAR 挖掘)" },
+          "followups": {
+            "type": "array",
+            "description": "跟进记录;每岗最多 2 次,草稿永不自动发送",
+            "items": {
+              "type": "object",
+              "required": ["date", "kind", "draft_only"],
+              "properties": {
+                "date": { "type": "string", "format": "date" },
+                "kind": { "type": "string", "enum": ["followup", "thank_you"] },
+                "draft_only": { "type": "boolean", "const": true },
+                "content_draft": { "type": "string" }
+              }
+            }
+          },
+          "archive_path": { "type": "string", "description": "归档目录 documents/applications/<company>_<role>/:posting、submitted cv/cover letter、outcome.md" },
+          "notes": { "type": "string", "description": "自由记录;含 followed up YYYY-MM-DD 标记" }
+        }
+      }
+    }
+  }
+}

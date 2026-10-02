@@ -1,0 +1,118 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "context-resume:candidate-profile:v1",
+  "title": "候选人档案(事实层)",
+  "description": "候选人唯一事实档案。吸收 career-ops config/profile.example.yml(commit 93b1cbb, MIT)与 self 项目事实总档案的 ABC 等级表。schema 唯一事实结构:服务与自用两侧均消费本档案,禁止各自维护。",
+  "upstream_source": {
+    "project": "santifer/career-ops",
+    "commit": "93b1cbb",
+    "license": "MIT"
+  },
+  "type": "object",
+  "required": ["profile_id", "version", "candidate", "target_roles", "narrative", "projects"],
+  "properties": {
+    "profile_id": { "type": "string", "description": "档案唯一 ID,如 self-001" },
+    "version": { "type": "string", "description": "档案版本,如 2026-08-01" },
+    "candidate": {
+      "type": "object",
+      "description": "身份与联系方式(投递时按目标岗位脱敏)",
+      "required": ["full_name"],
+      "properties": {
+        "full_name": { "type": "string" },
+        "school": { "type": "string", "description": "学校与专业年级,如 五邑大学·电子信息工程(集成电路)·2024 级" },
+        "location": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "phone": { "type": "string" },
+        "wechat": { "type": "string", "description": "自然语言微信号,投递前确认是否展示" },
+        "portfolio_url": { "type": "string", "description": "作品链接;无真实链接时必须留空,禁止虚构" },
+        "github": { "type": "string" },
+        "availability": {
+          "type": "object",
+          "description": "到岗与时间承诺(HR 筛选关键项,必须如实)",
+          "properties": {
+            "earliest_start": { "type": "string" },
+            "work_mode": { "type": "string", "enum": ["remote", "on_site", "hybrid"] },
+            "weekly_hours": { "type": "string", "description": "如 4-5 天/周,必须可兑现" },
+            "duration_months": { "type": "integer" },
+            "schedule_note": { "type": "string", "description": "如 9 月返校注册等时间约束" }
+          }
+        }
+      }
+    },
+    "target_roles": {
+      "type": "object",
+      "description": "目标岗位(吸收 career-ops target_roles:主/次/延伸三级)",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "北极星岗位,如 AI 应用/工作流自动化实习生"
+        },
+        "secondary": { "type": "array", "items": { "type": "string" } },
+        "adjacent": { "type": "array", "items": { "type": "string" }, "description": "延伸挑战岗" },
+        "archetypes": {
+          "type": "array",
+          "description": "岗位画像:名称/级别/匹配度(primary|secondary|adjacent)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "level": { "type": "string" },
+              "fit": { "type": "string", "enum": ["primary", "secondary", "adjacent"] }
+            }
+          }
+        },
+        "exclusions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "不投方向,如 大模型训练/推理框架/算子岗"
+        }
+      }
+    },
+    "narrative": {
+      "type": "object",
+      "description": "叙事与卖点(吸收 career-ops narrative + superpowers + proof_points)",
+      "properties": {
+        "headline": { "type": "string", "description": "一句话职业定位" },
+        "exit_story": { "type": "string", "description": "差异故事" },
+        "superpowers": { "type": "array", "items": { "type": "string" } },
+        "proof_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "url": { "type": "string" },
+              "hero_metric": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "object",
+      "description": "项目事实库(吸收 self 事实总档案 ABC 等级:只有 A/B 级可进简历,C 级不包装为独立成果)",
+      "required": ["tiers"],
+      "properties": {
+        "tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tier", "id", "name", "role_owned", "verifiable_result", "evidence_paths"],
+            "properties": {
+              "tier": { "type": "string", "enum": ["A", "B", "C"], "description": "A=核心主项目 B=按岗位选择性加入 C=有留痕不包装" },
+              "id": { "type": "string", "description": "稳定项目 ID,如 P01" },
+              "name": { "type": "string" },
+              "role_owned": { "type": "string", "description": "本人真实负责:需求/规则/验收/缺陷修复/AI 协作实现" },
+              "verifiable_result": { "type": "string", "description": "可证明结果,无证据不得填写" },
+              "evidence_paths": { "type": "array", "items": { "type": "string" }, "description": "本地证据位置(测试报告/日志/仓库路径)" },
+              "contribution_boundary": { "type": "string", "description": "本人/AI/队友/外部工具贡献边界" },
+              "ai_collaboration_note": { "type": "string", "description": "AI 协作说明(面试被问代码归属时的诚实口径)" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

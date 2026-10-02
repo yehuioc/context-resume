@@ -1,0 +1,14 @@
+AI 工作流自动化实习生(深圳)
+
+岗位职责:
+- 使用 AI 工具(Codex、Claude Code、DeepSeek API)把公司重复业务流程自动化
+- 对接 Telegram、飞书等平台 API,构建内部 Bot 与工作流
+- 编写自动化脚本(Python、PowerShell),处理数据整理、报表生成
+- 参与测试与验收,确保自动化流程稳定可复现
+
+任职要求:
+- 熟悉 python、api、workflow、automation 基础
+- 了解 LLM 应用(agent、prompt、tool calling),有实际项目优先
+- 熟悉 git、json、markdown
+- 有测试意识(单元测试、验收测试)
+- 每周可实习 4 天以上,本科在读即可
